@@ -19,7 +19,7 @@ class CreateUserRequest {
   name?: string;
 
   @IsOptional()
-  @IsIn(['CANDIDATE', 'RECRUITER','ADMIN'])
+  @IsIn(['CANDIDAT', 'RECRUTEUR','ADMIN'])
   user_type?: string;
 
   @IsOptional()

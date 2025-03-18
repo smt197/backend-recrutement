@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { UserValidationService } from '../services/UserValidationService';
+import { Role } from '../auth/roles.enum';
 
 @Injectable()
 export class UserService {
@@ -10,13 +11,13 @@ export class UserService {
     private userValidationService: UserValidationService,
   ) {}
 
-  async createUser(email: string, password: string) {
+  async createUser(email: string, password: string, role: Role) {
     // Valider les données d'entrée
-    await this.userValidationService.validateCreateUserRequest({ email, password });
+    await this.userValidationService.validateCreateUserRequest({ email, password, user_type: role });
 
     const hashedPassword = await bcrypt.hash(password, 10);
     return this.prisma.user.create({
-      data: { email, password: hashedPassword },
+      data: { email, password: hashedPassword, role },
     });
   }
 

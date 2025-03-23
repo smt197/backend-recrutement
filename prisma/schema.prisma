@@ -3,14 +3,57 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 model User {
   id       Int @id @default(autoincrement())
+  name String 
   email    String  @unique
   password String
-  role     String  @default("CANDIDAT")
+  role       Role     @default(CANDIDATE)
+  isTwoFA     Boolean @default(false)
+  twoFASecret String? 
+  jobOffers   JobOffer[]
+  applications Application[]
   createdAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+}
+
+model JobOffer {
+  id          String  @id @default(uuid())
+  title       String
+  description String
+  recruiterId Int
+  recruiter   User    @relation(fields: [recruiterId], references: [id])
+  applications Application[]
+  createdAt   DateTime @default(now())
+}
+
+model Application {
+  id         String  @id @default(uuid())
+  candidateId Int
+  candidate   User    @relation(fields: [candidateId], references: [id])
+  jobOfferId  String
+  jobOffer    JobOffer @relation(fields: [jobOfferId], references: [id])
+  status      ApplicationStatus @default(PENDING)
+  resumeUrl   String
+  coverLetterUrl String?
+  createdAt   DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  RECRUTEUR
+  CANDIDATE
+}
+
+enum ApplicationStatus {
+  PENDING
+  PRESELECTED
+  REJECTED
+  INTERVIEW
+  ACCEPTED
 }

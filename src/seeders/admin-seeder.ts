@@ -15,11 +15,13 @@ export async function seedAdmin() {
 
   // Hasher le mot de passe
   const password = 'Serigne197';
+  const name = 'Serigne';
   const hashedPassword = await bcrypt.hash(password, 10);
 
   // Créer l'utilisateur admin
   await prisma.user.create({
     data: {
+      name,
       email,
       password: hashedPassword,
       role: 'ADMIN',

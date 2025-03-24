@@ -22,7 +22,12 @@ export class AuthController {
   @Post('register')
   async register(
     @Body()
-    body: { name: string; email: string; password: string; role?: Role },
+    body: {
+      name: string;
+      email: string;
+      password: string;
+      role?: Role;
+    },
   ) {
     // Si aucun rôle n'est spécifié, définir par défaut sur CANDIDAT
     const role = body.role || Role.CANDIDATE;
@@ -88,6 +93,18 @@ export class AuthController {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  @Post('enable-2fa')
+  @UseGuards(JwtAuthGuard)
+  async enable2FA(@Request() req) {
+    return this.authService.enable2FA(req.user.userId);
+  }
+
+  @Post('verify-2fa')
+  @UseGuards(JwtAuthGuard)
+  async verify2FA(@Request() req, @Body('token') token: string) {
+    return this.authService.verify2FA(req.user.userId, token);
   }
 
   @Post('login')

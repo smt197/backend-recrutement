@@ -8,46 +8,63 @@ datasource db {
 }
 
 model User {
-  id       Int @id @default(autoincrement())
-  name String 
-  email    String  @unique
-  password String
-  role       Role     @default(CANDIDATE)
-  isTwoFA     Boolean @default(false)
-  twoFASecret String? 
-  jobOffers   JobOffer[]
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  password     String
+  role         Role          @default(CANDIDATE)
+  isTwoFA      Boolean       @default(false)
+  twoFASecret  String?
+  experience Int @default(1)
+  skills     Json? 
+  jobOffers    JobPost[]
   applications Application[]
-  createdAt DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
-model JobOffer {
-  id          String  @id @default(uuid())
-  title       String
-  description String
-  recruiterId Int
-  recruiter   User    @relation(fields: [recruiterId], references: [id])
+model JobPost {
+  id           Int           @id @default(autoincrement())
+  title        String
+  description  String
+  experience   Int
+  skills       Json?
+  location     String?
+  deadline     DateTime
   applications Application[]
-  createdAt   DateTime @default(now())
+  recruiterId  Int
+  recruiter    User          @relation(fields: [recruiterId], references: [id])
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model Application {
-  id         String  @id @default(uuid())
-  candidateId Int
-  candidate   User    @relation(fields: [candidateId], references: [id])
-  jobOfferId  String
-  jobOffer    JobOffer @relation(fields: [jobOfferId], references: [id])
-  status      ApplicationStatus @default(PENDING)
-  resumeUrl   String
+  id             Int      @id @default(autoincrement())
+  status         Status   @default(PENDING)
+  candidateId    Int
+  jobId          Int
+  cvUrl          String
   coverLetterUrl String?
-  createdAt   DateTime @default(now())
+  portfolioUrl   String?
+  candidate      User     @relation(fields: [candidateId], references: [id])
+  job            JobPost  @relation(fields: [jobId], references: [id])
+  consentGiven   Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 enum Role {
   ADMIN
   RECRUTEUR
   CANDIDATE
+}
+
+enum Status {
+  PENDING
+  PRESELECTED
+  REJECTED
+  INTERVIEW_SCHEDULED
+  ACCEPTED
 }
 
 enum ApplicationStatus {

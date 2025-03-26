@@ -16,10 +16,10 @@ export class ForbiddenFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     // Récupérer le rôle requis (si disponible)
-    const requiredRole =  'ADMIN'; // Exemple
+    const requiredRole =  'ADMIN' ; // Exemple
 
     response.status(403).json({
-      message: `Accès refusé : vous devez être un ${requiredRole} pour accéder à cette ressource.`,
+      message: `Accès refusé : vous ne pouvez pas accéder à cette ressource.`,
       error: 'Forbidden',
       statusCode: 403,
     });

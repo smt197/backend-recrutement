@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; }
+        .header { background-color: #f8f9fa; padding: 10px; text-align: center; }
+        .content { margin-top: 20px; }
+        .footer { margin-top: 20px; text-align: center; color: #888; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Confirmation de soumission de candidature</h1>
+        </div>
+        <div class="content">
+            <p>Bonjour {{name}},</p>
+            <p>Nous avons bien reçu votre candidature pour le poste de <strong>{{jobTitle}}</strong>. Nous vous remercions de votre intérêt.</p>
+            <p>Votre candidature est actuellement en cours de révision. Nous vous tiendrons informé(e) de toute mise à jour.</p>
+        </div>
+        <div class="footer">
+            <p>Cordialement,<br>L'équipe de recrutement</p>
+        </div>
+    </div>
+</body>
+</html>

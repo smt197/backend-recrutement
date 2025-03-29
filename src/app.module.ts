@@ -12,6 +12,7 @@ import { ApplicationController } from './application/application.controller';
 import { CloudinaryService } from './services/cloudinary/cloudinary.service';
 import { CloudinaryConfig } from './config/cloudinary.config';
 import { MulterConfigService } from './config/multer';
+import { MailService } from './services/email/mail.service';
 
 
 @Module({
@@ -26,6 +27,6 @@ import { MulterConfigService } from './config/multer';
     PrismaModule
   ],
   controllers: [AppController,JobController, ApplicationController],
-  providers: [AppService, JobService, ApplicationService, CloudinaryService,CloudinaryConfig, MulterConfigService],
+  providers: [AppService, JobService, ApplicationService, CloudinaryService,CloudinaryConfig, MulterConfigService, MailService],
 })
 export class AppModule {}

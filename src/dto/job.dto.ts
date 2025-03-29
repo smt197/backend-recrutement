@@ -4,6 +4,10 @@ import { IsNumber } from 'class-validator';
 import { IsString, IsNotEmpty, IsOptional, IsDateString, IsArray } from 'class-validator';
 
 export class CreateJobDto {
+  @IsNumber()
+  @IsOptional()
+  id?: number;
+  
   @IsString()
   @IsNotEmpty()
   title: string;

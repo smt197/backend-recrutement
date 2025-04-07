@@ -16,6 +16,7 @@ model User {
   isTwoFA      Boolean       @default(false)
   twoFAVerified Boolean @default(false)
   twoFASecret  String?
+  isLoggedIn Boolean @default(false)
   experience Int @default(1)
   skills     Json? 
   jobOffers    JobPost[]

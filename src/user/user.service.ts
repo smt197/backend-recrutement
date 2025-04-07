@@ -8,6 +8,7 @@ import { authenticator } from 'otplib';
 
 @Injectable()
 export class UserService {
+
   constructor(
     private prisma: PrismaService,
     private userValidationService: UserValidationService,
@@ -62,5 +63,15 @@ export class UserService {
 
   async findUserByEmail(email: string) {
     return this.prisma.user.findUnique({ where: { email } });
+  }
+
+  async findUserById(userId: string) {
+    return this.prisma.user.findUnique({ where: { id: parseInt(userId) } });
+  }
+  async logout(userId: string) {
+    return this.prisma.user.update({
+      where: { id: parseInt(userId) },
+      data: { isLoggedIn: false },
+    });
   }
 }

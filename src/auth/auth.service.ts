@@ -33,6 +33,32 @@ export class AuthService {
     };
   }
 
+  async logout(userId: string) {
+    return this.userService.logout(userId);
+  }
+  
+  async refreshToken(userId: string) {
+    const user = await this.userService.findUserById(userId);
+    if (!user) throw new UnauthorizedException('Invalid credentials');
+    const payload = { email: user.email, id: user.id, role: user.role };
+    return {
+      Message: 'Token refreshed successfully',
+      StatusCode: '200',
+      ...user,
+      access_token: this.jwtService.sign(payload),
+    };
+  }
+
+  async getUserById(userId: string) {
+    const user = await this.userService.findUserById(userId);
+    if (!user) throw new UnauthorizedException('Invalid credentials');
+    return {
+      Message: 'User found successfully',
+      StatusCode: '200',
+      ...user,
+    };
+  }
+
   async enable2FA(userId: string) {
     return this.userService.enable2FA(userId);
   }

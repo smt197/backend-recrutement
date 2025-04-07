@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Get,
   Body,
   Request,
   UseGuards,
@@ -113,7 +114,7 @@ export class AuthController {
     const user = await this.authService.validateUser(body.email, body.password);
     return this.authService.login(user);
   }
-  @Post('logout')
+  @Get('logout')
   @UseGuards(JwtAuthGuard)
   async logout(@Request() req) {
     try {

@@ -138,6 +138,16 @@ export class AuthController {
       );
     }
   }
+  @Get('verify-token')
+  @UseGuards(JwtAuthGuard)
+  async verifyToken(@Request() req) {
+    // Le guard JwtAuthGuard valide déjà le token
+    // On retourne les infos utilisateur si besoin
+    return {
+      access_token: req.headers.authorization.split(' ')[1],
+      user: req.user, // Les infos décodées du JWT
+    };
+  }
 
   @Post('profile')
   @UseGuards(JwtAuthGuard)

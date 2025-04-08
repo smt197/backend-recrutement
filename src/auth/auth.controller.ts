@@ -16,10 +16,15 @@ import { RolesGuard } from './roles.guard';
 import { Roles } from './roles.decorator';
 import { Role } from '@prisma/client';
 import { ForbiddenFilter } from 'src/filters/forbidden.filter';
+import { MailService } from 'src/services/email/mail.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private readonly mailService: MailService, 
+
+  ) {}
 
   @Post('register')
   async register(
@@ -48,12 +53,14 @@ export class AuthController {
     }
 
     try {
-      return await this.authService.registerUser(
+      const result = await this.authService.registerUser(
         body.name,
         body.email,
         body.password,
         role,
       );
+      await this.mailService.sendRegistrationEmail(body.email, body.name);
+      return result;
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;

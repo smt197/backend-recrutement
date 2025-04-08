@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; }
+        .header { background-color: #f8f9fa; padding: 10px; text-align: center; }
+        .content { margin-top: 20px; }
+        .footer { margin-top: 20px; text-align: center; color: #888; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Bienvenue sur notre plateforme CABI-RH</h1>
+        </div>
+        <div class="content">
+            <p>Bonjour {{name}},</p>
+           <p>Nous sommes ravis de vous confirmer que votre inscription à notre plateforme RH a bien été enregistrée le {{currentDate}}.</p>
+            
+            <p>Vous pouvez maintenant vous connecter et commencer à utiliser nos services :</p>
+            <ul>
+                <li>Parcourir les offres d'emploi disponibles</li>
+                <li>Compléter votre profil professionnel</li>
+                <li>Postuler aux offres qui correspondent à vos compétences</li>
+            </ul>
+            
+            <p>Si vous avez des questions ou besoin d'assistance, n'hésitez pas à contacter notre équipe support.</p>
+        </div>
+        <div class="footer">
+            <p>Cordialement,<br>L'équipe de recrutement</p>
+        </div>
+    </div>
+</body>
+</html>

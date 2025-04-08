@@ -39,4 +39,14 @@ export class MailService {
     const subject = 'Nouveau poste disponible';
     await this.sendMail(to, subject, { name, jobTitle, jobDescription, jobDeadline, jobSkills, jobExperience }, 'src/services/email/new-job-email-template.hbs');
   }
+
+  async sendRegistrationEmail(to: string, name: string) {
+    const subject = 'Bienvenue sur notre plateforme RH';
+    await this.sendMail(
+      to, 
+      subject, 
+      { name, currentDate: new Date().toLocaleDateString('fr-FR') }, 
+      'src/services/email/registration-email-template.hbs'
+    );
+  }
 }

@@ -17,7 +17,8 @@ export class ApplicationService {
     return this.prisma.application.create({
       data: dto,
     });
-  }
+  }  
+
 
   async getApplicationsForJob(jobId: number) {
     const applications = await this.prisma.application.findMany({
@@ -35,6 +36,23 @@ export class ApplicationService {
       },
     }));
   }
+  
+  async getAllApplications() {
+    const applications = await this.prisma.application.findMany({
+      include: { candidate: true }, 
+    });
+  
+    return applications.map(app => new ApplicationResponseDto({
+      ...app,
+      candidate: {
+        id: app.candidate.id,
+        name: app.candidate.name,
+        email: app.candidate.email,
+        role: app.candidate.role,
+      },
+    }));
+  }
+
 
 
   async updateApplicationStatus(id: number, status: Status) {

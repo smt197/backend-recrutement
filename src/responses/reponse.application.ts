@@ -15,6 +15,10 @@ export class ApplicationResponseDto {
     email: string;
     role: Role;
   };
+  job: {
+    id: number;
+    title: string;
+  };
 
   constructor(partial: Partial<ApplicationResponseDto>) {
     Object.assign(this, partial);

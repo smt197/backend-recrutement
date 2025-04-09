@@ -39,7 +39,10 @@ export class ApplicationService {
   
   async getAllApplications() {
     const applications = await this.prisma.application.findMany({
-      include: { candidate: true }, 
+      include: {
+         candidate: true,
+          job: true,
+        }, 
     });
   
     return applications.map(app => new ApplicationResponseDto({
@@ -49,6 +52,10 @@ export class ApplicationService {
         name: app.candidate.name,
         email: app.candidate.email,
         role: app.candidate.role,
+      },
+      job: {
+        id: app.job.id,
+        title: app.job.title,
       },
     }));
   }

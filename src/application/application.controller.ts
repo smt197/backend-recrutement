@@ -137,6 +137,14 @@ export class ApplicationController {
     return this.applicationService.getAllApplications();
   }
 
+
+  @Get('job/by-title/:title/candidates')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.RECRUTEUR)
+  async getApplicationsByJobTitle(@Param('title') title: string) {
+    return this.applicationService.getApplicationsByJobTitle(decodeURIComponent(title));
+}
+
   //Met à jour le statut d'une candidature spécifique
   @Patch(':id/status')
   @UseFilters(ForbiddenFilter)

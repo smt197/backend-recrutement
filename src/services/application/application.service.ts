@@ -36,6 +36,39 @@ export class ApplicationService {
       },
     }));
   }
+
+  async getApplicationsByJobTitle(title: string) {
+    const job = await this.prisma.jobPost.findFirst({
+      where: { title: { equals: title.toLowerCase() } },
+    });
+  
+    if (!job) {
+      throw new NotFoundException('Job not found');
+    }
+  
+    const applications = await this.prisma.application.findMany({
+      where: { jobId: job.id },
+      include: { 
+        candidate: true,
+        job: { select: { title: true, id:true } } 
+      },
+    });
+  
+    return applications.map(app => new ApplicationResponseDto({
+      ...app,
+      candidate: {
+        id: app.candidate.id,
+        name: app.candidate.name,
+        email: app.candidate.email,
+        role: app.candidate.role,
+      },
+      job: {
+        id: app.job.id,
+        title: app.job.title
+      }
+    }));
+  }
+  
   
   async getAllApplications() {
     const applications = await this.prisma.application.findMany({

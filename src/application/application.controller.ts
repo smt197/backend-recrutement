@@ -12,6 +12,7 @@ import {
   Param,
   Get,
   NotFoundException,
+  Query,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Role, Status } from '@prisma/client';
@@ -130,20 +131,32 @@ export class ApplicationController {
     return application;
   }
 
-  @Get() // Endpoint pour récupérer toutes les applications
+  @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.RECRUTEUR, Role.ADMIN) // Seulement pour recruteurs et admins
-  async getAllApplications() {
-    return this.applicationService.getAllApplications();
-  }
+  @Roles(Role.RECRUTEUR, Role.ADMIN)
+  async getAllApplications(
+    @Query('page') page: string, // Reçoit une string
+    @Query('limit') limit: string, // Reçoit une string
+  ) {
+    // Conversion en nombres avec valeurs par défaut
+    const pageNumber = parseInt(page, 10) || 1;
+    const limitNumber = parseInt(limit, 10) || 10;
 
+    return this.applicationService.getAllApplications(pageNumber, limitNumber);
+  }
 
   @Get('job/by-title/:title/candidates')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.RECRUTEUR)
-  async getApplicationsByJobTitle(@Param('title') title: string) {
-    return this.applicationService.getApplicationsByJobTitle(decodeURIComponent(title));
-}
+  async getApplicationsByJobTitle(
+    @Param('title') title: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.applicationService.getApplicationsByJobTitle(
+      decodeURIComponent(title),
+    );
+  }
 
   //Met à jour le statut d'une candidature spécifique
   @Patch(':id/status')

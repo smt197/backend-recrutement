@@ -68,29 +68,96 @@ export class ApplicationService {
       }
     }));
   }
+
+  // async getApplicationsByJobTitlePaginated(title: string, page: number, limit: number) {
+  //   const job = await this.prisma.jobPost.findFirst({
+  //     where: { title: { equals: title.toLowerCase() } },
+  //   });
   
   
-  async getAllApplications() {
-    const applications = await this.prisma.application.findMany({
-      include: {
-         candidate: true,
+  //   if (!job) {
+  //     throw new NotFoundException('Job not found');
+  //   }
+  
+  //   const total = await this.prisma.application.count({
+  //     where: { jobId: job.id },
+  //   });
+  
+  //   const applications = await this.prisma.application.findMany({
+  //     where: { jobId: job.id },
+  //     include: { 
+  //       candidate: true,
+  //       job: { select: { title: true , id:true} } 
+  //     },
+  //     skip: (page - 1) * limit,
+  //     take: limit,
+  //     orderBy: { createdAt: 'desc' }
+  //   });
+  
+  //   return {
+  //     data: applications.map(app => new ApplicationResponseDto({
+  //       ...app,
+  //       candidate: {
+  //         id: app.candidate.id,
+  //         name: app.candidate.name,
+  //         email: app.candidate.email,
+  //         role: app.candidate.role,
+  //       },
+  //       job: {
+  //         id: app.job.id,
+  //         title: app.job.title
+  //       }
+  //     })),
+  //     meta: {
+  //       total,
+  //       page,
+  //       limit,
+  //       totalPages: Math.ceil(total / limit)
+  //     }
+  //   };
+  // }
+  
+  
+  async getAllApplications(page: number = 1, limit: number = 10) {
+    // Calculer l'offset pour la pagination
+    const skip = (page - 1) * limit;
+    
+    const [applications, totalCount] = await Promise.all([
+      this.prisma.application.findMany({
+        skip,
+        take: limit,
+        include: {
+          candidate: true,
           job: true,
-        }, 
-    });
+        },
+        orderBy: {
+          createdAt: 'asc', // Tri par date de création décroissante
+        },
+      }),
+      this.prisma.application.count()
+    ]);
   
-    return applications.map(app => new ApplicationResponseDto({
-      ...app,
-      candidate: {
-        id: app.candidate.id,
-        name: app.candidate.name,
-        email: app.candidate.email,
-        role: app.candidate.role,
-      },
-      job: {
-        id: app.job.id,
-        title: app.job.title,
-      },
-    }));
+    return {
+      data: applications.map(app => new ApplicationResponseDto({
+        ...app,
+        candidate: {
+          id: app.candidate.id,
+          name: app.candidate.name,
+          email: app.candidate.email,
+          role: app.candidate.role,
+        },
+        job: {
+          id: app.job.id,
+          title: app.job.title,
+        },
+      })),
+      meta: {
+        total: totalCount,
+        page,
+        limit,
+        totalPages: Math.ceil(totalCount / limit),
+      }
+    };
   }
 
 

@@ -4,21 +4,15 @@ import { CreateApplicationDto } from '../../dto/application.dto';
 import { Status } from '@prisma/client';
 import { ApplicationResponseDto } from 'src/responses/reponse.application';
 
-
 @Injectable()
 export class ApplicationService {
-
-  constructor(
-    private prisma: PrismaService,
-
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async apply(dto: CreateApplicationDto) {
     return this.prisma.application.create({
       data: dto,
     });
-  }  
-
+  }
 
   async getApplicationsForJob(jobId: number) {
     const applications = await this.prisma.application.findMany({
@@ -26,102 +20,59 @@ export class ApplicationService {
       include: { candidate: true },
     });
 
-    return applications.map(app => new ApplicationResponseDto({
-      ...app,
-      candidate: {
-        id: app.candidate.id,
-        name: app.candidate.name,
-        email: app.candidate.email,
-        role: app.candidate.role,
-      },
-    }));
+    return applications.map(
+      (app) =>
+        new ApplicationResponseDto({
+          ...app,
+          candidate: {
+            id: app.candidate.id,
+            name: app.candidate.name,
+            email: app.candidate.email,
+            role: app.candidate.role,
+          },
+        }),
+    );
   }
 
   async getApplicationsByJobTitle(title: string) {
     const job = await this.prisma.jobPost.findFirst({
       where: { title: { equals: title.toLowerCase() } },
     });
-  
+
     if (!job) {
       throw new NotFoundException('Job not found');
     }
-  
+
     const applications = await this.prisma.application.findMany({
       where: { jobId: job.id },
-      include: { 
+      include: {
         candidate: true,
-        job: { select: { title: true, id:true } } 
+        job: { select: { title: true, id: true } },
       },
     });
-  
-    return applications.map(app => new ApplicationResponseDto({
-      ...app,
-      candidate: {
-        id: app.candidate.id,
-        name: app.candidate.name,
-        email: app.candidate.email,
-        role: app.candidate.role,
-      },
-      job: {
-        id: app.job.id,
-        title: app.job.title
-      }
-    }));
+
+    return applications.map(
+      (app) =>
+        new ApplicationResponseDto({
+          ...app,
+          candidate: {
+            id: app.candidate.id,
+            name: app.candidate.name,
+            email: app.candidate.email,
+            role: app.candidate.role,
+          },
+          job: {
+            id: app.job.id,
+            title: app.job.title,
+          },
+        }),
+    );
   }
 
-  // async getApplicationsByJobTitlePaginated(title: string, page: number, limit: number) {
-  //   const job = await this.prisma.jobPost.findFirst({
-  //     where: { title: { equals: title.toLowerCase() } },
-  //   });
-  
-  
-  //   if (!job) {
-  //     throw new NotFoundException('Job not found');
-  //   }
-  
-  //   const total = await this.prisma.application.count({
-  //     where: { jobId: job.id },
-  //   });
-  
-  //   const applications = await this.prisma.application.findMany({
-  //     where: { jobId: job.id },
-  //     include: { 
-  //       candidate: true,
-  //       job: { select: { title: true , id:true} } 
-  //     },
-  //     skip: (page - 1) * limit,
-  //     take: limit,
-  //     orderBy: { createdAt: 'desc' }
-  //   });
-  
-  //   return {
-  //     data: applications.map(app => new ApplicationResponseDto({
-  //       ...app,
-  //       candidate: {
-  //         id: app.candidate.id,
-  //         name: app.candidate.name,
-  //         email: app.candidate.email,
-  //         role: app.candidate.role,
-  //       },
-  //       job: {
-  //         id: app.job.id,
-  //         title: app.job.title
-  //       }
-  //     })),
-  //     meta: {
-  //       total,
-  //       page,
-  //       limit,
-  //       totalPages: Math.ceil(total / limit)
-  //     }
-  //   };
-  // }
-  
-  
   async getAllApplications(page: number = 1, limit: number = 10) {
     // Calculer l'offset pour la pagination
     const skip = (page - 1) * limit;
-    
+
     const [applications, totalCount] = await Promise.all([
       this.prisma.application.findMany({
         skip,
@@ -134,36 +85,36 @@ export class ApplicationService {
           createdAt: 'asc', // Tri par date de création décroissante
         },
       }),
-      this.prisma.application.count()
+      this.prisma.application.count(),
     ]);
-  
+
     return {
-      data: applications.map(app => new ApplicationResponseDto({
-        ...app,
-        candidate: {
-          id: app.candidate.id,
-          name: app.candidate.name,
-          email: app.candidate.email,
-          role: app.candidate.role,
-        },
-        job: {
-          id: app.job.id,
-          title: app.job.title,
-        },
-      })),
+      data: applications.map(
+        (app) =>
+          new ApplicationResponseDto({
+            ...app,
+            candidate: {
+              id: app.candidate.id,
+              name: app.candidate.name,
+              email: app.candidate.email,
+              role: app.candidate.role,
+            },
+            job: {
+              id: app.job.id,
+              title: app.job.title,
+            },
+          }),
+      ),
       meta: {
         total: totalCount,
         page,
         limit,
         totalPages: Math.ceil(totalCount / limit),
-      }
+      },
     };
   }
 
-
-
   async updateApplicationStatus(id: number, status: Status) {
-
     // verifier si le status existe
     const validStatuses = Object.values(Status);
     if (!validStatuses.includes(status)) {
@@ -182,7 +133,7 @@ export class ApplicationService {
       data: { status },
       include: { candidate: true }, // Inclure les informations du candidat
     });
-  
+
     // Utilisez le DTO pour formater la réponse
     return new ApplicationResponseDto({
       ...updatedApplication,
@@ -194,17 +145,16 @@ export class ApplicationService {
       },
     });
   }
-  
 
   async filterCandidates(jobId: number) {
     const job = await this.prisma.jobPost.findUnique({
       where: { id: jobId },
     });
-  
+
     if (!job) {
       throw new NotFoundException('Job not found');
     }
-  
+
     const applications = await this.prisma.application.findMany({
       where: { jobId },
       include: { candidate: true },
@@ -213,16 +163,22 @@ export class ApplicationService {
     if (!applications || applications.length === 0) {
       return [];
     }
-  
+
     // Vérifiez que job.skills est une chaîne de caractères
-    const jobSkills = Array.isArray(job.skills) ? job.skills : (typeof job.skills === 'string' ? job.skills.split(',') : []);
-  
-    return applications.filter(app =>
-      app.candidate.experience >= job.experience &&
-      jobSkills.some(skill =>
-        Array.isArray(app.candidate.skills) && app.candidate.skills.includes(skill)
-      )
+    const jobSkills = Array.isArray(job.skills)
+      ? job.skills
+      : typeof job.skills === 'string'
+        ? job.skills.split(',')
+        : [];
+
+    return applications.filter(
+      (app) =>
+        app.candidate.experience >= job.experience &&
+        jobSkills.some(
+          (skill) =>
+            Array.isArray(app.candidate.skills) &&
+            app.candidate.skills.includes(skill),
+        ),
     );
   }
-  
 }

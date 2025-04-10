@@ -181,6 +181,10 @@ export class ApplicationController {
         statusMessage =
           "Votre candidature a été rejetée. Nous vous encourageons à postuler à nouveau à l'avenir.";
         break;
+      case Status.PRESELECTED:
+        statusMessage =
+          'Vous avez ete préselectionné. Nous vous recontacterons pour la suite.';
+        break;
       case Status.PENDING:
         statusMessage = 'Votre candidature est en cours de révision.';
         break;

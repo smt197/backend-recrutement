@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { MulterModuleOptions, MulterOptionsFactory } from '@nestjs/platform-express';
+import {
+  MulterModuleOptions,
+  MulterOptionsFactory,
+} from '@nestjs/platform-express';
 import multer from 'multer';
 
 @Injectable()
@@ -9,13 +12,13 @@ export class MulterConfigService implements MulterOptionsFactory {
       storage: multer.memoryStorage(),
       fileFilter: (req, file, cb) => {
         const allowedTypes = [
-          'image/jpeg', 
-          'image/png', 
-          'image/gif', 
-          'application/pdf', 
-          'video/mp4', 
-          'application/msword', 
-          'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+          'image/jpeg',
+          'image/png',
+          'image/gif',
+          'application/pdf',
+          'video/mp4',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         ];
 
         if (allowedTypes.includes(file.mimetype)) {
@@ -25,8 +28,8 @@ export class MulterConfigService implements MulterOptionsFactory {
         }
       },
       limits: {
-        fileSize: 10 * 1024 * 1024 // 10MB
-      }
+        fileSize: 10 * 1024 * 1024, // 10MB
+      },
     };
   }
 }

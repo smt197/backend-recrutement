@@ -210,13 +210,20 @@ export class ApplicationController {
   }
 
   //Filtre les candidats pour un poste donné en fonction des compétences et de l'expérience requises pour le poste.
-  @Get('filter/:jobId')
-  async filterCandidates(@Param('jobId') jobId: string) {
-    const numericId = parseInt(jobId, 10);
-    if (isNaN(numericId)) {
-      throw new BadRequestException('Invalid ID format');
-    }
-    return this.applicationService.filterCandidates(numericId);
+  // @Get('filter/:title')
+  // async filterCandidates(@Param('title') title: string) {
+  //   const numericId = parseInt(jobId, 10);
+  //   if (isNaN(numericId)) {
+  //     throw new BadRequestException('Invalid ID format');
+  //   }
+  //   return this.applicationService.filterCandidates(numericId);
+  // }
+
+  @Get('filter/:title')
+  async filterCandidatesByTitle(@Param('title') title: string) {
+    return this.applicationService.filterCandidatesByTitle(
+      decodeURIComponent(title),
+    );
   }
 
   //Récupère toutes les candidatures pour un poste spécifique.

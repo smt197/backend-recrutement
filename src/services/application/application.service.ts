@@ -146,17 +146,23 @@ export class ApplicationService {
     });
   }
 
-  async filterCandidates(jobId: number) {
-    const job = await this.prisma.jobPost.findUnique({
-      where: { id: jobId },
+  async filterCandidatesByTitle(title: string) {
+    // 1. Trouver le job correspondant au titre
+    const job = await this.prisma.jobPost.findFirst({
+      where: {
+        title: {
+          contains: title.toLowerCase(),
+        },
+      },
     });
 
     if (!job) {
-      throw new NotFoundException('Job not found');
+      throw new NotFoundException('Aucun poste trouvé avec ce titre');
     }
 
+    // 2. Récupérer les candidatures pour ce job
     const applications = await this.prisma.application.findMany({
-      where: { jobId },
+      where: { jobId: job.id },
       include: { candidate: true },
     });
 
@@ -164,7 +170,7 @@ export class ApplicationService {
       return [];
     }
 
-    // Vérifiez que job.skills est une chaîne de caractères
+    // 3. Filtrer par compétences et expérience (comme dans votre version originale)
     const jobSkills = Array.isArray(job.skills)
       ? job.skills
       : typeof job.skills === 'string'
@@ -173,7 +179,7 @@ export class ApplicationService {
 
     return applications.filter(
       (app) =>
-        app.candidate.experience >= job.experience &&
+        app.candidate.experience >= job.experience ||
         jobSkills.some(
           (skill) =>
             Array.isArray(app.candidate.skills) &&

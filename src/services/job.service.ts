@@ -7,8 +7,7 @@ import { MailService } from './email/mail.service';
 export class JobService {
   constructor(
     private prisma: PrismaService,
-    private mailService: MailService
-
+    private mailService: MailService,
   ) {}
 
   async createJob(recruiterId: number, dto: CreateJobDto) {
@@ -37,15 +36,45 @@ export class JobService {
         newJob.description,
         newJob.deadline.toISOString().split('T')[0], // Format de la date
         (newJob.skills as string[]).join(', '), // Convertir les compétences en chaîne de caractères
-        newJob.experience
+        newJob.experience,
       );
     }
 
     return newJob;
   }
 
-  async getAllJobs() {
-    return this.prisma.jobPost.findMany();
+  async getAllJobs(page: number = 1, limit: number = 10, search?: string) {
+    const skip = (page - 1) * limit;
+    const where = search
+      ? {
+          OR: [
+            { title: { contains: search, lte: 'insensitive' } },
+            { description: { contains: search, lte: 'insensitive' } },
+          ],
+        }
+      : {};
+
+    const [jobs, total] = await Promise.all([
+      this.prisma.jobPost.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' }, // Optionnel: tri par date de création
+      }),
+      this.prisma.jobPost.count({ where }),
+    ]);
+
+    return {
+      data: jobs,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page * limit < total,
+        hasPreviousPage: page > 1,
+      },
+    };
   }
 
   async getJobsByRecruiter(recruiterId: number) {
@@ -53,7 +82,6 @@ export class JobService {
       where: { recruiterId },
     });
   }
-
 
   async getJobById(id: number) {
     return this.prisma.jobPost.findUnique({ where: { id } });

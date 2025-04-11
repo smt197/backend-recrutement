@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Get,
+  Query,
   Put,
   Delete,
   Body,
@@ -23,7 +24,8 @@ import { PrismaService } from 'prisma/prisma.service';
 @Controller('jobs')
 export class JobController {
   constructor(
-    private readonly jobService: JobService,private prisma: PrismaService,
+    private readonly jobService: JobService,
+    private prisma: PrismaService,
   ) {}
 
   @Post('add')
@@ -54,8 +56,17 @@ export class JobController {
   }
 
   @Get()
-  async getAllJobs() {
-    return this.jobService.getAllJobs();
+  @UseGuards(JwtAuthGuard)
+  async getAllJobs(
+    @Query('page') pageString: string = '1',
+    @Query('limit') limitString: string = '10',
+    @Query('search') search?: string,
+  ) {
+    const page = parseInt(pageString, 10);
+    const limit = parseInt(limitString, 10);
+
+    // Utiliser les valeurs numériques
+    return this.jobService.getAllJobs(page, limit, search);
   }
 
   @Get('titles')

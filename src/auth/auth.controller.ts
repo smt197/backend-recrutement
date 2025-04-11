@@ -22,8 +22,7 @@ import { MailService } from 'src/services/email/mail.service';
 export class AuthController {
   constructor(
     private authService: AuthService,
-    private readonly mailService: MailService, 
-
+    private readonly mailService: MailService,
   ) {}
 
   @Post('register')
@@ -34,6 +33,8 @@ export class AuthController {
       email: string;
       password: string;
       role?: Role;
+      experience?: number;
+      skills?: string[];
     },
   ) {
     // Si aucun rôle n'est spécifié, définir par défaut sur CANDIDAT
@@ -58,6 +59,8 @@ export class AuthController {
         body.email,
         body.password,
         role,
+        body.experience ?? 1,
+        body.skills ?? [],
       );
       await this.mailService.sendRegistrationEmail(body.email, body.name);
       return result;

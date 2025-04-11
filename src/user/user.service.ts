@@ -5,35 +5,58 @@ import { UserValidationService } from '../services/UserValidationService';
 import { Role } from '@prisma/client';
 import { authenticator } from 'otplib';
 
-
 @Injectable()
 export class UserService {
-
   constructor(
     private prisma: PrismaService,
     private userValidationService: UserValidationService,
   ) {}
 
-  async createUser(name:string, email: string, password: string, role: Role) {
+  async createUser(name: string, email: string, password: string, role: Role) {
     // Valider les données d'entrée
-    await this.userValidationService.validateCreateUserRequest({name, email, password, role});
+    await this.userValidationService.validateCreateUserRequest({
+      name,
+      email,
+      password,
+      role,
+    });
 
     const hashedPassword = await bcrypt.hash(password, 10);
     return this.prisma.user.create({
-      data: {name, email, password: hashedPassword, role },
+      data: { name, email, password: hashedPassword, role },
     });
   }
 
-  async createUserSimple(name:string, email: string, password: string, role: Role) {
-    // Valider les données d'entrée
-    await this.userValidationService.validateCreateUserSimpleRequest({name, email, password, role});
+  async createUserSimple(
+    name: string,
+    email: string,
+    password: string,
+    role: Role,
+    experience: number = 1,
+    skills: string[] = [],
+  ) {
+    await this.userValidationService.validateCreateUserSimpleRequest({
+      name,
+      email,
+      password,
+      role,
+      experience,
+      skills,
+    });
 
     const hashedPassword = await bcrypt.hash(password, 10);
+
     return this.prisma.user.create({
-      data: {name, email, password: hashedPassword, role },
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        role,
+        experience,
+        skills,
+      },
     });
   }
-
   async enable2FA(userId: string) {
     const secret = authenticator.generateSecret();
     // console.log(secret);
@@ -46,7 +69,9 @@ export class UserService {
   }
 
   async verify2FA(userId: string, token: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: parseInt(userId) } });
+    const user = await this.prisma.user.findUnique({
+      where: { id: parseInt(userId) },
+    });
     if (!user || !user.twoFASecret) {
       throw new BadRequestException('2FA not enabled');
     }
@@ -56,7 +81,6 @@ export class UserService {
     if (!isValid) {
       throw new BadRequestException('Invalid 2FA token');
     }
-
 
     return isValid;
   }

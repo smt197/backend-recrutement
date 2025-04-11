@@ -1,15 +1,26 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { validate } from 'class-validator';
+import { IsArray, IsInt, Min, validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
-import { IsEmail, IsString, MinLength, MaxLength, IsOptional, IsIn } from 'class-validator';
-import { registerDecorator, ValidationOptions, ValidationArguments } from 'class-validator';
+import {
+  IsEmail,
+  IsString,
+  MinLength,
+  MaxLength,
+  IsOptional,
+  IsIn,
+} from 'class-validator';
+import {
+  registerDecorator,
+  ValidationOptions,
+  ValidationArguments,
+} from 'class-validator';
 import { Role } from '@prisma/client';
 
 class CreateUserRequest {
   @IsEmail()
   @MaxLength(255)
   email: string;
-  
+
   @IsString()
   @MinLength(8)
   password: string;
@@ -20,7 +31,7 @@ class CreateUserRequest {
   name?: string;
 
   @IsOptional()
-  @IsIn(['CANDIDAT', 'RECRUTEUR','ADMIN'])
+  @IsIn(['CANDIDAT', 'RECRUTEUR', 'ADMIN'])
   role?: Role;
 
   @IsOptional()
@@ -34,7 +45,7 @@ class CreateUserSimpleRequest {
   @IsEmail()
   @MaxLength(255)
   email: string;
-  
+
   @IsString()
   @MinLength(8)
   password: string;
@@ -46,6 +57,16 @@ class CreateUserSimpleRequest {
 
   @IsOptional()
   role?: Role;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  experience?: number;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  skills?: string[];
 
   @IsOptional()
   @IsString()
@@ -60,15 +81,20 @@ export class UserValidationService {
     const createUserInstance = plainToInstance(CreateUserRequest, data);
     const errors = await validate(createUserInstance);
     if (errors.length > 0) {
-        const errorMessages = errors.flatMap(err =>
-            Object.values(err.constraints!).map(constraint => `${constraint}`)
-        ).join(', ');
-        throw new HttpException({
-            error: 'Validation failed',
-            message: errorMessages,
-            statusCode: HttpStatus.BAD_REQUEST,
-          }, HttpStatus.BAD_REQUEST);
-        }
+      const errorMessages = errors
+        .flatMap((err) =>
+          Object.values(err.constraints!).map((constraint) => `${constraint}`),
+        )
+        .join(', ');
+      throw new HttpException(
+        {
+          error: 'Validation failed',
+          message: errorMessages,
+          statusCode: HttpStatus.BAD_REQUEST,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     return true;
   }
 
@@ -76,16 +102,20 @@ export class UserValidationService {
     const createUserInstance = plainToInstance(CreateUserSimpleRequest, data);
     const errors = await validate(createUserInstance);
     if (errors.length > 0) {
-        const errorMessages = errors.flatMap(err =>
-            Object.values(err.constraints!).map(constraint => `${constraint}`)
-        ).join(', ');
-        throw new HttpException({
-            error: 'Validation failed',
-            message: errorMessages,
-            statusCode: HttpStatus.BAD_REQUEST,
-          }, HttpStatus.BAD_REQUEST);
-        }
+      const errorMessages = errors
+        .flatMap((err) =>
+          Object.values(err.constraints!).map((constraint) => `${constraint}`),
+        )
+        .join(', ');
+      throw new HttpException(
+        {
+          error: 'Validation failed',
+          message: errorMessages,
+          statusCode: HttpStatus.BAD_REQUEST,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     return true;
   }
 }
-

@@ -4,7 +4,6 @@ import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { Role } from '@prisma/client';
 
-
 @Injectable()
 export class AuthService {
   constructor(
@@ -23,7 +22,12 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = { email: user.email, id: user.id, role: user.role, name: user.name  };
+    const payload = {
+      email: user.email,
+      id: user.id,
+      role: user.role,
+      name: user.name,
+    };
     console.log(payload);
     return {
       Message: 'Login Successful',
@@ -36,7 +40,7 @@ export class AuthService {
   async logout(userId: string) {
     return this.userService.logout(userId);
   }
-  
+
   async refreshToken(userId: string) {
     const user = await this.userService.findUserById(userId);
     if (!user) throw new UnauthorizedException('Invalid credentials');
@@ -64,18 +68,32 @@ export class AuthService {
   }
 
   async verify2FA(userId: string, token: string) {
-    return this.userService.verify2FA(userId,token);
+    return this.userService.verify2FA(userId, token);
   }
 
-  async registerUser(name:string,email: string, password: string, role: Role) {
-    return this.userService.createUserSimple(name,email, password, role);
+  async registerUser(
+    name: string,
+    email: string,
+    password: string,
+    role: Role,
+    experience: number,
+    skills: string[],
+  ) {
+    return this.userService.createUserSimple(
+      name,
+      email,
+      password,
+      role,
+      experience,
+      skills,
+    );
   }
 
   async findUserByEmail(email: string) {
     return this.userService.findUserByEmail(email);
   }
 
-  async register(name:string,email: string, password: string, role: Role) {
-    return this.userService.createUser(name,email, password, role);
+  async register(name: string, email: string, password: string, role: Role) {
+    return this.userService.createUser(name, email, password, role);
   }
 }

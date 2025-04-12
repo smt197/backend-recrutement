@@ -114,6 +114,27 @@ export class ApplicationService {
     };
   }
 
+  async getApplicationsByUserId(userId: number, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const applications = await this.prisma.application.findMany({
+      where: { candidateId: userId },
+      include: { candidate: true, job: true },
+      skip,
+      take: limit,
+    });
+
+    const total = await this.prisma.application.count({
+      where: { candidateId: userId },
+    });
+
+    return {
+      applications,
+      total,
+      page,
+      limit,
+    };
+  }
+
   async updateApplicationStatus(id: number, status: Status) {
     // verifier si le status existe
     const validStatuses = Object.values(Status);

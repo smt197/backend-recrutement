@@ -9,15 +9,15 @@ export class MailService {
 
   constructor() {
     this.transporter = nodemailer.createTransport({
-      host: 'sandbox.smtp.mailtrap.io', // Remplacez par votre hôte SMTP
+      host: 'sandbox.smtp.mailtrap.io',
       port: 2525,
       auth: {
         user: '15852be328df1e',
-        pass: 'ecb3b42e847d72', // Remplacez par votre mot de passe correct
+        pass: 'ecb3b42e847d72',
       },
-      secure: false, // true for 465, false for other ports
+      secure: false,
       tls: {
-        rejectUnauthorized: false, // Pour ignorer les erreurs de certificat
+        rejectUnauthorized: false,
       },
     });
   }

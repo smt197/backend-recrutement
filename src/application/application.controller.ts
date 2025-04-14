@@ -13,6 +13,8 @@ import {
   Get,
   NotFoundException,
   Query,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Role, Status } from '@prisma/client';
@@ -81,15 +83,18 @@ export class ApplicationController {
       );
     }
     // Vérifier si le candidat a déjà postulé à ce poste
-    const existingApplication = await this.prisma.application.findFirst({
-      where: {
-        candidateId: req.user.userId,
-        jobId: parseInt(body.jobId, 10),
-      },
-    });
-    if (existingApplication) {
-      throw new BadRequestException('You have already applied for this job.');
-    }
+    // const existingApplication = await this.prisma.application.findFirst({
+    //   where: {
+    //     candidateId: req.user.userId,
+    //     jobId: parseInt(body.jobId, 10),
+    //   },
+    // });
+    // if (existingApplication) {
+    //   throw new HttpException(
+    //     'You have already applied for this job.',
+    //     HttpStatus.BAD_REQUEST,
+    //   );
+    // }
 
     // Upload des fichiers vers Cloudinary
     const cvUrl = await this.cloudinaryService.uploadFile(files.cv[0], 'cv');

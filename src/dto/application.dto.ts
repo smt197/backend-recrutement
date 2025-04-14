@@ -1,13 +1,13 @@
 import { Status } from '@prisma/client';
-import { IsString, IsNotEmpty, IsOptional, IsBoolean, IsNumber, IsEnum, IsDate } from 'class-validator';
-
-// export enum Status {
-//     PENDING = "PENDING",
-//     PRESELECTED = "PRESELECTED",
-//     REJECTED = "REJECTED",
-//     INTERVIEW_SCHEDULED = "INTERVIEW_SCHEDULED",
-//     ACCEPTED = "ACCEPTED",
-// }
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsBoolean,
+  IsNumber,
+  IsEnum,
+  IsDate,
+} from 'class-validator';
 
 export class CreateApplicationDto {
   @IsNumber()
@@ -15,7 +15,7 @@ export class CreateApplicationDto {
   id?: number;
 
   @IsEnum(Status)
-  @IsOptional() 
+  @IsOptional()
   status?: Status;
 
   @IsNumber()
@@ -41,5 +41,4 @@ export class CreateApplicationDto {
   @IsBoolean()
   @IsOptional()
   consentGiven: boolean;
-
 }

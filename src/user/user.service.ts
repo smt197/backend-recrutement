@@ -68,7 +68,23 @@ export class UserService {
     return authenticator.keyuri(userId, 'GestionCandidature', secret);
   }
 
+  //desable2FA
+  async disable2FA(userId: string) {
+    await this.prisma.user.update({
+      where: { id: parseInt(userId) },
+      data: { twoFASecret: null, isTwoFA: false },
+    });
+  }
+
+
+
+
+
+
+
+
   async verify2FA(userId: string, token: string) {
+    
     const user = await this.prisma.user.findUnique({
       where: { id: parseInt(userId) },
     });

@@ -3,6 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { Role } from '@prisma/client';
+import { authenticator } from 'otplib';
+import * as QRCode from 'qrcode';
 
 @Injectable()
 export class AuthService {
@@ -28,7 +30,36 @@ export class AuthService {
       role: user.role,
       name: user.name,
     };
+
     console.log(payload);
+
+    // Si 2FA est activé, ne pas envoyer le token tout de suite
+    if (user.isTwoFA) {
+      const tempToken = this.jwtService.sign(
+        {
+          id: user.id, // <-- Ici on met "id" au lieu de "sub"
+          twoFA: true,
+          email: user.email,
+          role: user.role,
+        },
+        { expiresIn: '5m' },
+      );
+      const otpauthUrl = authenticator.keyuri(
+        user.id,
+        'GestionCandidature',
+        user.twoFASecret,
+      );
+      const qrCode = await QRCode.toDataURL(otpauthUrl);
+
+      return {
+        message: '2FA required',
+        requires2FA: true,
+        userId: user.id,
+        temp_token: tempToken,
+        qrCode,
+      };
+    }
+
     return {
       Message: 'Login Successful',
       StatusCode: '200',
@@ -64,10 +95,25 @@ export class AuthService {
   }
 
   async enable2FA(userId: string) {
-    return this.userService.enable2FA(userId);
+    const keyUri = await this.userService.enable2FA(userId);
+    const qrCodeDataUrl = await QRCode.toDataURL(keyUri); // image en base64
+
+    return {
+      message: '2FA enabled successfully',
+      keyUri,
+      qrCode: qrCodeDataUrl,
+    };
+  }
+
+  async disable2FA(userId: string) {
+    await this.userService.disable2FA(userId);
+    return {
+      message: '2FA disabled successfully',
+    };
   }
 
   async verify2FA(userId: string, token: string) {
+    const user = await this.userService.findUserById(userId);
     return this.userService.verify2FA(userId, token);
   }
 
@@ -87,6 +133,16 @@ export class AuthService {
       experience,
       skills,
     );
+  }
+
+  async generateJwt(user: any) {
+    const payload = {
+      email: user.email,
+      id: user.id,
+      role: user.role,
+      name: user.name,
+    };
+    return this.jwtService.sign(payload);
   }
 
   async findUserByEmail(email: string) {

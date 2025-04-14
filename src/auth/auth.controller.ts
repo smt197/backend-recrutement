@@ -9,6 +9,7 @@ import {
   HttpStatus,
   UseFilters,
   HttpCode,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -17,12 +18,18 @@ import { Roles } from './roles.decorator';
 import { Role } from '@prisma/client';
 import { ForbiddenFilter } from 'src/filters/forbidden.filter';
 import { MailService } from 'src/services/email/mail.service';
+import { JwtService } from '@nestjs/jwt';
+import { authenticator } from 'otplib';
+import * as QRCode from 'qrcode';
+import { UserService } from 'src/user/user.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private readonly mailService: MailService,
+    private jwtService: JwtService,
+    private userService: UserService, 
   ) {}
 
   @Post('register')
@@ -107,16 +114,57 @@ export class AuthController {
     }
   }
 
-  @Post('enable-2fa')
+  @Post('2fa/enable')
   @UseGuards(JwtAuthGuard)
   async enable2FA(@Request() req) {
     return this.authService.enable2FA(req.user.userId);
   }
 
+  @Post('2fa/disable')
+  @UseGuards(JwtAuthGuard)
+  async disable2FA(@Request() req) {
+    return this.authService.disable2FA(req.user.userId);
+    
+  }
+
+
+
   @Post('verify-2fa')
   @UseGuards(JwtAuthGuard)
   async verify2FA(@Request() req, @Body('token') token: string) {
-    return this.authService.verify2FA(req.user.userId, token);
+    const userId = req.user.userId;
+    // console.log(userId);
+    console.log('req.user:', req.user);
+
+    const isValid = await this.authService.verify2FA(userId, token);
+    if (isValid) {
+      const user = await this.authService.getUserById(userId);
+      const access_token = await this.authService.generateJwt(user);
+
+      return {
+        message: '2FA verified successfully',
+        access_token,
+        user,
+      };
+    }
+  }
+
+  @Get('temp-info')
+  @UseGuards(JwtAuthGuard)
+  async getTempInfo(@Request() req) {
+    const user = await this.userService.findUserById(req.user.userId);
+    if (!user || !user.twoFASecret) {
+      throw new UnauthorizedException('2FA non configurée');
+    }
+
+    const otpauthUrl = authenticator.keyuri(
+      user.id.toString(),
+      'GestionCandidature',
+      user.twoFASecret,
+    );
+    const qrCode = await QRCode.toDataURL(otpauthUrl);
+
+    return { qrCode };
   }
 
   @Post('login')
@@ -151,8 +199,6 @@ export class AuthController {
   @Get('verify-token')
   @UseGuards(JwtAuthGuard)
   async verifyToken(@Request() req) {
-    // Le guard JwtAuthGuard valide déjà le token
-    // On retourne les infos utilisateur si besoin
     return {
       access_token: req.headers.authorization.split(' ')[1],
       user: req.user, // Les infos décodées du JWT

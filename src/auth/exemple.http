@@ -1,0 +1,23 @@
+# POST http://localhost:3002/auth/login HTTP/1.1
+# content-type: application/json
+
+    # {
+    #     "email": "omar@gmail.com",
+    #     "password": "P@sser12"
+    # }
+
+# {
+#     "email": "tekie@tekie.com",
+#     "password": "P@sser12"
+# }
+
+POST http://localhost:3002/auth/enable-2fa HTTP/1.1
+content-type: application/json,
+accept: application/json,
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE3LCJ0d29GQSI6dHJ1ZSwiaWF0IjoxNzQ0NjU5NzA1LCJleHAiOjE3NDQ2NjAwMDV9.YEIJuaNdglNQft3uVHqitGk_BxcFqvVYKpIPfOD1VIA
+
+
+{
+    "userId": 17
+    
+}

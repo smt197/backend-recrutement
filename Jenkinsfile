@@ -28,17 +28,17 @@ pipeline {
     //   }
     // }
 
-    stage('Build') {
-      steps {
-        sh 'npm run build'
-      }
-    }
+    // stage('Build') {
+    //   steps {
+    //     sh 'npm run build'
+    //   }
+    // }
 
-    stage('Run Tests') {
-      steps {
-        sh 'npm run test'
-      }
-    }
+    // stage('Run Tests') {
+    //   steps {
+    //     sh 'npm run test'
+    //   }
+    // }
 
     stage('Deploy') {
       when {

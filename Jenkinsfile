@@ -6,7 +6,7 @@ pipeline {
   }
 
   tools {
-    nodejs 'NodeJS_20' // Défini dans Jenkins > Global Tools Configuration
+    nodejs 'NodeJS_22' // Défini dans Jenkins > Global Tools Configuration
   }
 
   stages {

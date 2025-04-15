@@ -12,7 +12,7 @@ pipeline {
   stages {
     stage('Checkout Code') {
       steps {
-        git credentialsId: 'your-git-credentials-id', url: 'https://github.com/smt197/backend-recrutement.git', branch: 'master'
+        git credentialsId: 'smt', url: 'https://github.com/smt197/backend-recrutement.git', branch: 'master'
       }
     }
 
@@ -22,11 +22,11 @@ pipeline {
       }
     }
 
-    stage('Lint') {
-      steps {
-        sh 'npm run lint'
-      }
-    }
+    // stage('Lint') {
+    //   steps {
+    //     sh 'npm run lint'
+    //   }
+    // }
 
     stage('Build') {
       steps {

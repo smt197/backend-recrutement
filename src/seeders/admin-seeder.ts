@@ -14,8 +14,8 @@ export async function seedAdmin() {
   }
 
   // Hasher le mot de passe
-  const password = 'Serigne197';
-  const name = 'Serigne';
+  const password = 'P@sser12';
+  const name = 'Admin';
   const hashedPassword = await bcrypt.hash(password, 10);
 
   // Créer l'utilisateur admin

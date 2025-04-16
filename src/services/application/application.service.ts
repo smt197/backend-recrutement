@@ -36,7 +36,12 @@ export class ApplicationService {
 
   async getApplicationsByJobTitle(title: string) {
     const job = await this.prisma.jobPost.findFirst({
-      where: { title: { equals: title.toLowerCase() } },
+      where: {
+        title: {
+          equals: title,
+          mode: 'insensitive', // 👈 Ignore la casse
+        },
+      },
     });
 
     if (!job) {
@@ -172,7 +177,8 @@ export class ApplicationService {
     const job = await this.prisma.jobPost.findFirst({
       where: {
         title: {
-          contains: title.toLowerCase(),
+          contains: title,
+          mode: 'insensitive',
         },
       },
     });

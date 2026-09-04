@@ -75,8 +75,9 @@ export class AuthController {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.error('Registration error details:', error);
       throw new HttpException(
-        'Internal Server Error',
+        error.message || 'Internal Server Error',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

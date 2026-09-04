@@ -180,7 +180,7 @@ export class ApplicationController {
 
   @Get('job/by-title/:title/candidates')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.RECRUTEUR)
+  @Roles(Role.RECRUTEUR, Role.ADMIN)
   async getApplicationsByJobTitle(
     @Param('title') title: string,
     @Query('page') page: number = 1,
@@ -195,7 +195,7 @@ export class ApplicationController {
   @Patch(':id/status')
   @UseFilters(ForbiddenFilter)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.RECRUTEUR)
+  @Roles(Role.RECRUTEUR, Role.ADMIN)
   async updateStatus(@Param('id') id: string, @Body('status') status: Status) {
     const numericId = parseInt(id, 10);
     if (isNaN(numericId)) {
@@ -263,7 +263,7 @@ export class ApplicationController {
   @Get('job/:jobId/candidates')
   @UseFilters(ForbiddenFilter)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.RECRUTEUR)
+  @Roles(Role.RECRUTEUR, Role.ADMIN)
   async getCandidatesForJob(@Param('jobId') jobId: string) {
     const numericId = parseInt(jobId, 10);
     if (isNaN(numericId)) {
@@ -276,7 +276,7 @@ export class ApplicationController {
   @Get('job/:jobId/candidates/:candidateId')
   @UseFilters(ForbiddenFilter)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.RECRUTEUR)
+  @Roles(Role.RECRUTEUR, Role.ADMIN)
   async getCandidateForJob(
     @Param('jobId') jobId: string,
     @Param('candidateId') candidateId: string,

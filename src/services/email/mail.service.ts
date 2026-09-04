@@ -10,7 +10,7 @@ export class MailService {
   constructor() {
     this.transporter = nodemailer.createTransport({
       host: '127.0.0.1', // Remplacez par votre hôte SMTP
-      port: 1025, // Remplacez par votre port SMTP
+      port: 8025, // Remplacez par votre port SMTP
       secure: false, // Utilisez true si vous utilisez un port sécurisé
     });
   }
@@ -26,13 +26,17 @@ export class MailService {
     const html = template(templateParams);
 
     const mailOptions = {
-      from: 'no-reply@rh.com', // Remplacez par votre adresse e-mail
+      from: 'contact-cabi@rh.com', // Remplacez par votre adresse e-mail
       to,
       subject,
       html,
     };
 
-    await this.transporter.sendMail(mailOptions);
+    try {
+      await this.transporter.sendMail(mailOptions);
+    } catch (error) {
+      console.warn(`[MailService] Failed to send email to ${to}: ${error.message}`);
+    }
   }
 
   async sendConfirmationEmail(to: string, name: string, jobTitle: string) {

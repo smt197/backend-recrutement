@@ -7,7 +7,7 @@ import { seedAdmin } from './seeders/admin-seeder';
 
 
 async function bootstrap() {
-  // await seedAdmin();
+  await seedAdmin();
   const app = await NestFactory.create(AppModule);
 
   // Activer CORS

@@ -29,6 +29,7 @@ import { ApplicationResponseDto } from 'src/responses/reponse.application';
 import { ApplicationService } from 'src/services/application/application.service';
 import { CloudinaryService } from 'src/services/cloudinary/cloudinary.service';
 import { MailService } from 'src/services/email/mail.service';
+import { AiMatchingService } from 'src/services/ollama/ai-matching.service';
 
 @Controller('applications')
 export class ApplicationController {
@@ -36,6 +37,7 @@ export class ApplicationController {
     private readonly applicationService: ApplicationService,
     private readonly cloudinaryService: CloudinaryService,
     private readonly mailService: MailService,
+    private readonly aiMatchingService: AiMatchingService,
     private prisma: PrismaService,
   ) {}
 
@@ -82,19 +84,6 @@ export class ApplicationController {
         'The application deadline for this job has passed.',
       );
     }
-    // Vérifier si le candidat a déjà postulé à ce poste
-    // const existingApplication = await this.prisma.application.findFirst({
-    //   where: {
-    //     candidateId: req.user.userId,
-    //     jobId: parseInt(body.jobId, 10),
-    //   },
-    // });
-    // if (existingApplication) {
-    //   throw new HttpException(
-    //     'You have already applied for this job.',
-    //     HttpStatus.BAD_REQUEST,
-    //   );
-    // }
 
     // Upload des fichiers vers Cloudinary
     const cvUrl = await this.cloudinaryService.uploadFile(files.cv[0], 'cv');
@@ -134,9 +123,14 @@ export class ApplicationController {
 
     const application = await this.applicationService.apply(applicationData);
 
+    // Déclencher l'analyse IA (Ollama + PDF Parser) en arrière-plan
+    this.aiMatchingService.analyzeApplication(application.id).catch((err) => {
+      console.error(`Erreur d'analyse IA en arrière-plan pour l'app #${application.id}:`, err);
+    });
+
     // Envoyer un e-mail de confirmation au candidat
-    const candidateEmail = req.user.email; // Assurez-vous que l'e-mail du candidat est accessible
-    const candidateName = req.user.name; // Assurez-vous que le nom du candidat est accessible
+    const candidateEmail = req.user.email;
+    const candidateName = req.user.name;
     await this.mailService.sendConfirmationEmail(
       candidateEmail,
       candidateName,
@@ -144,6 +138,17 @@ export class ApplicationController {
     );
 
     return application;
+  }
+
+  @Post(':id/analyze')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.RECRUTEUR, Role.ADMIN)
+  async analyzeApplication(@Param('id') id: string) {
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      throw new BadRequestException('Invalid ID format');
+    }
+    return this.aiMatchingService.analyzeApplication(numericId);
   }
 
   @Get()

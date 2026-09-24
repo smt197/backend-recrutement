@@ -13,6 +13,7 @@ import { CloudinaryService } from './services/cloudinary/cloudinary.service';
 import { CloudinaryConfig } from './config/cloudinary.config';
 import { MulterConfigService } from './config/multer';
 import { MailService } from './services/email/mail.service';
+import { AiMatchingService } from './services/ollama/ai-matching.service';
 
 
 @Module({
@@ -27,6 +28,6 @@ import { MailService } from './services/email/mail.service';
     PrismaModule
   ],
   controllers: [AppController,JobController, ApplicationController],
-  providers: [AppService, JobService, ApplicationService, CloudinaryService,CloudinaryConfig, MulterConfigService, MailService],
+  providers: [AppService, JobService, ApplicationService, CloudinaryService,CloudinaryConfig, MulterConfigService, MailService, AiMatchingService],
 })
 export class AppModule {}

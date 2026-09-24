@@ -48,6 +48,8 @@ model Application {
   cvUrl          String
   coverLetterUrl String?
   portfolioUrl   String?
+  matchScore     Float?
+  aiAnalysis     Json?
   candidate      User     @relation(fields: [candidateId], references: [id])
   job            JobPost  @relation(fields: [jobId], references: [id])
   consentGiven   Boolean  @default(false)

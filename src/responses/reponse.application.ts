@@ -6,6 +6,8 @@ export class ApplicationResponseDto {
   cvUrl: string;
   coverLetterUrl?: string | null;
   portfolioUrl?: string | null;
+  matchScore?: number | null;
+  aiAnalysis?: any;
   consentGiven: boolean;
   createdAt: Date;
   updatedAt: Date;

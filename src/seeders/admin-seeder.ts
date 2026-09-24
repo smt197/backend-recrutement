@@ -70,6 +70,30 @@ export async function seedAdmin() {
     } else {
       console.log('Candidate already exists.');
     }
+
+    // 4. Créer un second compte Candidat (Mareme Diop) s'il n'existe pas
+    const maremeEmail = 'maremediop@gmail.com';
+    const existingMareme = await prisma.user.findUnique({ where: { email: maremeEmail } });
+    if (!existingMareme) {
+      const maremePassword = 'P@sser12';
+      const maremeName = 'Mareme Diop';
+      const hashedMaremePassword = await bcrypt.hash(maremePassword, 10);
+
+      await prisma.user.create({
+        data: {
+          name: maremeName,
+          email: maremeEmail,
+          password: hashedMaremePassword,
+          role: 'CANDIDATE',
+          experience: 5,
+          skills: ['php', 'js', 'java', 'c', 'python', 'html', 'css', 'django'],
+        },
+      });
+
+      console.log('Mareme Diop candidate account created successfully.');
+    } else {
+      console.log('Mareme Diop already exists.');
+    }
   } catch (error) {
     console.error('Error seeding users:', error);
   } finally {

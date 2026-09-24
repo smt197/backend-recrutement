@@ -1,18 +1,43 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import * as fs from 'fs';
+import * as path from 'path';
 import * as handlebars from 'handlebars';
 
 @Injectable()
 export class MailService {
   private transporter;
 
-  constructor() {
+constructor() {
+   
     this.transporter = nodemailer.createTransport({
-      host: '127.0.0.1', // Remplacez par votre hôte SMTP
-      port: 8025, // Remplacez par votre port SMTP
-      secure: false, // Utilisez true si vous utilisez un port sécurisé
+      host: 'sandbox.smtp.mailtrap.io',
+      port: 2525,
+      auth: {
+        user: '15852be328df1e',
+        pass: 'ecb3b42e847d72'
+      }
     });
+  }
+
+  private resolveTemplatePath(relativePath: string): string {
+    const fileName = path.basename(relativePath);
+    // 1. Tenter la résolution par rapport au dossier courant du fichier compilé (__dirname)
+    const dirPath = path.join(__dirname, fileName);
+    if (fs.existsSync(dirPath)) {
+      return dirPath;
+    }
+    // 2. Tenter depuis le dossier de travail courant (process.cwd())
+    const cwdPath = path.join(process.cwd(), relativePath);
+    if (fs.existsSync(cwdPath)) {
+      return cwdPath;
+    }
+    // 3. Fallback sur dist/src/services/email/
+    const distPath = path.join(process.cwd(), 'dist', relativePath);
+    if (fs.existsSync(distPath)) {
+      return distPath;
+    }
+    return dirPath;
   }
 
   async sendMail(
@@ -21,7 +46,8 @@ export class MailService {
     templateParams: any,
     templatePath: string,
   ) {
-    const source = fs.readFileSync(templatePath, 'utf8');
+    const fullPath = this.resolveTemplatePath(templatePath);
+    const source = fs.readFileSync(fullPath, 'utf8');
     const template = handlebars.compile(source);
     const html = template(templateParams);
 

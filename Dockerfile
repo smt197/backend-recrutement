@@ -17,4 +17,4 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
 RUN npm install --only=production
 RUN npx prisma generate
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/main"]
+CMD ["sh", "-c", "npx prisma db push && node dist/src/main"]

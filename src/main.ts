@@ -16,6 +16,8 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
+
+  app.setGlobalPrefix('api');
   // app.useGlobalFilters(new ForbiddenFilter()); // Appliquer le filtre globalement
   // app.useGlobalPipes(new ValidationPipe());
   const x = await app.listen(process.env.PORT ?? 3002);

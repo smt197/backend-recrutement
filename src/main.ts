@@ -12,7 +12,7 @@ async function bootstrap() {
 
   // Activer CORS
   app.enableCors({
-    origin: 'http://localhost:4200', // ou true pour autoriser toutes les origines
+    origin: ['http://localhost:4200', 'https://front-recrutement.onrender.com'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });

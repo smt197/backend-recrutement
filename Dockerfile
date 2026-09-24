@@ -14,5 +14,7 @@ FROM node:18-alpine
 WORKDIR /app
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/prisma ./prisma
 RUN npm install --only=production
+RUN npx prisma generate
 CMD ["node", "dist/src/main"]

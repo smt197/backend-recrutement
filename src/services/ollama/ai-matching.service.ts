@@ -6,7 +6,7 @@ import axios from 'axios';
 export class AiMatchingService {
   private readonly logger = new Logger(AiMatchingService.name);
   private readonly pythonAiUrl =
-    process.env.PYTHON_AI_URL || 'http://localhost:8000/match';
+    process.env.PYTHON_AI_URL || 'https://assistantai-vw6j.onrender.com/match';
 
   constructor(private prisma: PrismaService) {}
 
@@ -56,10 +56,7 @@ export class AiMatchingService {
       let response;
       const targetUrls = [
         process.env.PYTHON_AI_URL,
-        'http://localhost:8000/match',
-        'http://localhost:8001/match',
-        'http://127.0.0.1:8000/match',
-        'http://127.0.0.1:8001/match'
+        'https://assistantai-vw6j.onrender.com/match',
       ].filter(Boolean) as string[];
 
       let lastError = null;

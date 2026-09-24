@@ -46,6 +46,30 @@ export async function seedAdmin() {
     } else {
       console.log('Recruiter already exists.');
     }
+
+    // 3. Créer un compte Candidat par défaut s'il n'existe pas
+    const candidateEmail = 'serignembayet@gmail.com';
+    const existingCandidate = await prisma.user.findUnique({ where: { email: candidateEmail } });
+    if (!existingCandidate) {
+      const candidatePassword = 'P@sser12';
+      const candidateName = 'Serigne Mbaye';
+      const hashedCandidatePassword = await bcrypt.hash(candidatePassword, 10);
+
+      await prisma.user.create({
+        data: {
+          name: candidateName,
+          email: candidateEmail,
+          password: hashedCandidatePassword,
+          role: 'CANDIDATE',
+          experience: 2,
+          skills: ['Angular', 'TypeScript', 'NestJS'],
+        },
+      });
+
+      console.log('Candidate account created successfully.');
+    } else {
+      console.log('Candidate already exists.');
+    }
   } catch (error) {
     console.error('Error seeding users:', error);
   } finally {
